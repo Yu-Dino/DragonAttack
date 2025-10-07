@@ -18,6 +18,7 @@ public class DragonListener implements Listener {
 
     private final Dragonattack plugin;
     private final Random random = new Random();
+    private long lastDashTime = 0;
 
     public DragonListener(Dragonattack plugin) {
         this.plugin = plugin;
@@ -28,11 +29,25 @@ public class DragonListener implements Listener {
         EnderDragon dragon = event.getEntity();
         EnderDragon.Phase newPhase = event.getNewPhase();
 
+        boolean isFlying = newPhase == EnderDragon.Phase.CIRCLING || newPhase == EnderDragon.Phase.SEARCH_FOR_BREATH_ATTACK_TARGET || newPhase == EnderDragon.Phase.FLY_TO_PORTAL;
+
+        if (isFlying) {
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastDashTime > 8000 && random.nextInt(10) < 4) { // 40% Chance
+                Player target = findNearestPlayer(dragon, 200);
+                if (target != null) {
+                    lastDashTime = currentTime;
+                    dragonDashAttack(dragon, target);
+                    return;
+                }
+            }
+        }
+
         if (newPhase == EnderDragon.Phase.SEARCH_FOR_BREATH_ATTACK_TARGET) {
             Player target = findNearestPlayer(dragon, 150);
             if (target == null) return;
 
-            int attackChoice = random.nextInt(4);
+            int attackChoice = random.nextInt(3);
             switch (attackChoice) {
                 case 0:
                     fireballBarrage(dragon, target);
@@ -41,9 +56,6 @@ public class DragonListener implements Listener {
                     lightningStorm(target);
                     break;
                 case 2:
-                    dragonDashAttack(dragon, target);
-                    break;
-                case 3:
                     enderRift(dragon, target);
                     break;
             }
@@ -82,7 +94,7 @@ public class DragonListener implements Listener {
             dragon.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, dragon.getLocation(), 20, 1, 1, 1, 0.1);
 
             for (Player p : dragon.getWorld().getPlayers()) {
-                if (p.getLocation().distanceSquared(dragon.getLocation()) < 25) {
+                if (p.getGameMode() != GameMode.CREATIVE && p.getGameMode() != GameMode.SPECTATOR && p.getLocation().distanceSquared(dragon.getLocation()) < 25) {
                     p.getWorld().playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2.0F, 1.0F);
                     p.getWorld().spawnParticle(Particle.EXPLOSION_EMITTER, p.getLocation(), 1);
                     p.damage(10.0, dragon);
