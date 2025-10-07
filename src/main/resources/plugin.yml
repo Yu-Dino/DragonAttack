@@ -1,0 +1,7 @@
+name: DragonAttack
+version: 1.0.0
+main: net.yuflow.dragonattack.Dragonattack
+api-version: '1.21'
+author: Yu_Dino
+description: Fügt dem Enderdrachen für Folia neue, epische Attacken hinzu.
+folia-supported: true
