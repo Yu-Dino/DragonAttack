@@ -6,12 +6,12 @@ public final class Dragonattack extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        getLogger().info("DragonAttack wurde für Folia aktiviert!");
+        getLogger().info("DragonAttack Folia aktiviert");
         getServer().getPluginManager().registerEvents(new DragonListener(this), this);
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("DragonAttack wurde deaktiviert!");
+        getLogger().info("DragonAttack deaktiviert");
     }
 }
